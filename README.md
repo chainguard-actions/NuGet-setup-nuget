@@ -1,1 +1,15 @@
-# NuGet-setup-nuget
+# NuGet/setup-nuget
+
+Official NuGet.exe setup action that supports cross-platform installation of specific NuGet.exe versions.
+
+Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/NuGet/setup-nuget](https://github.com/NuGet/setup-nuget).
+
+## Versions
+
+| Version | Tag | Upstream commit |
+|---------|-----|-----------------|
+| v3.0.0 | [`v3.0.0`](https://github.com/chainguard-actions/NuGet-setup-nuget/tree/v3.0.0) | [`12c5794`](https://github.com/NuGet/setup-nuget/commit/12c57947e9458a5b976961b08ea0706a17dd71ae) |
+
+## Privacy
+
+This Action contacts Chainguard's licensing server to verify authorization. Connection metadata (IP address, GitHub repository identifier, timestamp, and any metadata encoded in the auth token) is transmitted to Chainguard, Inc. even if authorization is denied in accordance with our [Privacy Notice](https://www.chainguard.dev/legal/privacy-notice)
