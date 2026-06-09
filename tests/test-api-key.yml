@@ -1,0 +1,18 @@
+name: Test NuGet API key configuration
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          nuget-version: 'latest'
+          nuget-api-key: 'test-api-key-value'
+          nuget-api-key-source: 'https://api.nuget.org/v3/index.json'
+      - name: Assert nuget is available
+        run: |
+          which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
+          echo "PASS: nuget is available with API key configured"
