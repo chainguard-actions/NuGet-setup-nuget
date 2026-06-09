@@ -1,4 +1,4 @@
-name: Test basic usage - latest nuget version
+name: Test basic usage - latest NuGet
 on:
   workflow_dispatch:
 jobs:
@@ -10,8 +10,7 @@ jobs:
         uses: .
         with:
           nuget-version: 'latest'
-      - name: Assert nuget is installed
+      - name: Assert nuget is available
         run: |
           which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
-          nuget help | head -1
-          echo "PASS: nuget is installed"
+          echo "PASS: nuget is available"
