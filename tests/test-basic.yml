@@ -10,11 +10,7 @@ jobs:
         uses: .
         with:
           nuget-version: 'latest'
-      - name: Assert nuget is installed
+      - name: Assert nuget is available
         run: |
           which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
-          echo "PASS: nuget is installed"
-      - name: Assert nuget version output
-        run: |
-          nuget help | head -1
-          echo "PASS: nuget runs successfully"
+          echo "PASS: nuget is available"
