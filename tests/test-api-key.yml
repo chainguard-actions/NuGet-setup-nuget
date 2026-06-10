@@ -1,4 +1,4 @@
-name: Test NuGet API key configuration
+name: Test nuget-api-key input
 on:
   workflow_dispatch:
 jobs:
@@ -11,7 +11,7 @@ jobs:
         with:
           nuget-version: 'latest'
           nuget-api-key: 'test-api-key-12345'
-      - name: Assert nuget is available
+      - name: Assert nuget is available after api-key configuration
         run: |
           which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
-          echo "PASS: nuget is available with API key configured"
+          echo "PASS: nuget is available with api-key configured"
