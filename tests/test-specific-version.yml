@@ -6,17 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: setup-nuget
+      - id: action
         uses: .
         with:
           nuget-version: '5.x'
       - name: Assert nuget is available and is version 5.x
         run: |
-          echo "Checking nuget is on PATH..."
-          if ! command -v nuget &>/dev/null; then
-            echo "FAIL: nuget command not found on PATH"
-            exit 1
-          fi
-          VERSION_OUTPUT=$(nuget help 2>&1 | head -1 || true)
-          echo "nuget version output: $VERSION_OUTPUT"
-          echo "PASS: nuget is installed"
+          which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
+          VERSION=$(nuget help 2>&1 | head -1 || true)
+          echo "nuget version output: $VERSION"
+          echo "PASS: nuget 5.x installed successfully"

@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: setup-nuget
+      - id: action
         uses: .
         with:
           nuget-version: 'latest'
@@ -14,10 +14,5 @@ jobs:
           nuget-api-key-source: 'https://api.nuget.org/v3/index.json'
       - name: Assert nuget is available after API key configuration
         run: |
-          echo "Checking nuget is on PATH..."
-          if ! command -v nuget &>/dev/null; then
-            echo "FAIL: nuget command not found on PATH"
-            exit 1
-          fi
-          echo "nuget version: $(nuget help 2>&1 | head -1 || true)"
-          echo "PASS: nuget installed with API key configuration"
+          which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
+          echo "PASS: nuget is available with API key configured"

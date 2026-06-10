@@ -1,4 +1,4 @@
-name: Test basic usage (latest nuget)
+name: Test basic usage - latest nuget version
 on:
   workflow_dispatch:
 jobs:
@@ -6,16 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: setup-nuget
+      - id: action
         uses: .
         with:
           nuget-version: 'latest'
       - name: Assert nuget is available
         run: |
-          echo "Checking nuget is on PATH..."
-          if ! command -v nuget &>/dev/null; then
-            echo "FAIL: nuget command not found on PATH"
-            exit 1
-          fi
-          echo "nuget version: $(nuget help | head -1 || true)"
-          echo "PASS"
+          which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
+          nuget help | head -1
+          echo "PASS: nuget is available"
