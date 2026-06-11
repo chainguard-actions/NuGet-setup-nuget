@@ -1,0 +1,18 @@
+import * as core from '@actions/core';
+import installer from './installer.js';
+
+async function run() {
+  try {
+    await installer(
+      core.getInput('nuget-version'),
+      core.getInput('nuget-api-key'),
+      core.getInput('nuget-api-key-source')
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    }
+  }
+}
+
+run();
