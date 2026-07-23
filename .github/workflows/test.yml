@@ -1,0 +1,25 @@
+name: "Test setup-nuget-exe"
+
+on: [pull_request, push]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        nuget-version: [latest, preview]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    steps:
+    - uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e # v1
+
+    - run: npm ci
+    - run: npm run build
+    - run: npm test
+    - uses: ./
+      with:
+        nuget-version: ${{ matrix.nuget-version }}
+        nuget-api-key: ${{ secrets.NuGetAPIKey }}
+    - run: nuget

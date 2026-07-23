@@ -1,0 +1,43 @@
+name: Test setup-nuget specific version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup
+        uses: .
+        with:
+          nuget-version: '5.3.1'
+      - name: Assert nuget-version output is exactly 5.3.1
+        env:
+          NUGET_VERSION: ${{ steps.setup.outputs.nuget-version }}
+        run: |
+          echo "nuget-version output: $NUGET_VERSION"
+          if [ "$NUGET_VERSION" = "5.3.1" ]; then
+            echo "PASS: nuget version is exactly 5.3.1"
+          else
+            echo "FAIL: expected version 5.3.1, got: $NUGET_VERSION"
+            exit 1
+          fi
+      - name: Assert NUGET env var points to nuget.exe
+        run: |
+          echo "NUGET env var: $NUGET"
+          if [ -z "$NUGET" ]; then
+            echo "FAIL: NUGET env var is not set"
+            exit 1
+          fi
+          if [ ! -f "$NUGET" ]; then
+            echo "FAIL: nuget.exe not found at $NUGET"
+            exit 1
+          fi
+          echo "PASS: nuget.exe exists at $NUGET"
+      - name: Assert nuget script is on PATH
+        run: |
+          echo "Checking nuget is on PATH..."
+          if ! command -v nuget >/dev/null 2>&1; then
+            echo "FAIL: nuget command not found on PATH"
+            exit 1
+          fi
+          echo "PASS: nuget found at $(command -v nuget)"

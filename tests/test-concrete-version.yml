@@ -1,0 +1,29 @@
+name: Test setup-nuget concrete version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      RUNNER_TOOL_CACHE: /opt/hostedtoolcache
+      RUNNER_TEMP: /tmp/runner-temp
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Prepare runner directories
+        run: |
+          mkdir -p /opt/hostedtoolcache
+          mkdir -p /tmp/runner-temp
+      - id: setup-nuget
+        uses: .
+        with:
+          nuget-version: '5.3.1'
+      - name: Assert nuget-version output equals 5.3.1
+        env:
+          ACTUAL: ${{ steps.setup-nuget.outputs.nuget-version }}
+        run: |
+          echo "nuget-version output: $ACTUAL"
+          if [ "$ACTUAL" != "5.3.1" ]; then
+            echo "FAIL: expected nuget-version '5.3.1' but got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: nuget-version is 5.3.1"
