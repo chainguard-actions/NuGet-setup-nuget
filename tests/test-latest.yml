@@ -1,0 +1,29 @@
+name: Test setup-nuget latest version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup
+        uses: .
+        with:
+          nuget-version: 'latest'
+      - name: Assert nuget is available
+        run: |
+          echo "Checking nuget is on PATH..."
+          if ! command -v nuget &>/dev/null; then
+            echo "FAIL: nuget command not found on PATH"
+            exit 1
+          fi
+          echo "PASS: nuget found at $(command -v nuget)"
+      - name: Assert nuget version output
+        run: |
+          VERSION_OUTPUT=$(nuget help 2>&1 | head -1 || true)
+          echo "nuget version output: $VERSION_OUTPUT"
+          if [ -z "$VERSION_OUTPUT" ]; then
+            echo "FAIL: nuget produced no output"
+            exit 1
+          fi
+          echo "PASS: nuget is functional"
