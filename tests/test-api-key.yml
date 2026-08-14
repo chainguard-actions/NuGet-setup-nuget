@@ -1,4 +1,4 @@
-name: Test NuGet setup with API key
+name: Test NuGet with API key source configuration
 on:
   workflow_dispatch:
 jobs:
@@ -6,12 +6,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+      - id: setup
         uses: .
         with:
           nuget-version: 'latest'
-          nuget-api-key: 'test-api-key-12345'
-      - name: Assert nuget is available
+          nuget-api-key: 'test-api-key-value'
+          nuget-api-key-source: 'https://api.nuget.org/v3/index.json'
+      - name: Assert nuget-version output is set
+        env:
+          NUGET_VERSION: ${{ steps.setup.outputs.nuget-version }}
         run: |
-          which nuget || (echo "FAIL: nuget not found in PATH" && exit 1)
-          echo "PASS: nuget is available with API key configured"
+          echo "nuget-version output: $NUGET_VERSION"
+          if [ -z "$NUGET_VERSION" ]; then
+            echo "FAIL: nuget-version output is empty"
+            exit 1
+          fi
+          echo "PASS: nuget-version output is '$NUGET_VERSION'"
+      - name: Assert nuget.exe file exists
+        env:
+          NUGET_PATH: ${{ env.NUGET }}
+        run: |
+          echo "NUGET env var: $NUGET_PATH"
+          if [ -z "$NUGET_PATH" ]; then
+            echo "FAIL: NUGET env var is not set"
+            exit 1
+          fi
+          if [ ! -f "$NUGET_PATH" ]; then
+            echo "FAIL: nuget.exe not found at $NUGET_PATH"
+            exit 1
+          fi
+          echo "PASS: nuget.exe found at $NUGET_PATH"
+      - name: Assert nuget script is on PATH
+        run: |
+          echo "Checking nuget script is on PATH..."
+          if ! command -v nuget &>/dev/null; then
+            echo "FAIL: nuget command not found on PATH"
+            exit 1
+          fi
+          echo "PASS: nuget found at $(command -v nuget)"

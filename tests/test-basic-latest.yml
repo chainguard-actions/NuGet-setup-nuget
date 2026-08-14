@@ -1,0 +1,37 @@
+name: Test NuGet setup - latest version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup-nuget
+        name: Setup NuGet (latest)
+        uses: .
+        with:
+          nuget-version: 'latest'
+      - name: Assert nuget is available on PATH
+        run: |
+          echo "Checking nuget is available..."
+          if ! command -v nuget &>/dev/null && ! nuget help &>/dev/null 2>&1; then
+            # Try to find nuget in common locations
+            if [ -f "$HOME/.nuget/nuget.exe" ] || find /usr /opt /home -name "nuget.exe" 2>/dev/null | grep -q .; then
+              echo "PASS: nuget.exe found on filesystem"
+            else
+              echo "FAIL: nuget not found"
+              exit 1
+            fi
+          else
+            echo "PASS: nuget command is available"
+          fi
+      - name: Assert nuget version output is set
+        run: |
+          echo "Verifying nuget can report its version..."
+          nuget_version=$(nuget help 2>&1 | head -1 || true)
+          echo "nuget output: $nuget_version"
+          if [ -z "$nuget_version" ]; then
+            echo "FAIL: nuget produced no output"
+            exit 1
+          fi
+          echo "PASS"

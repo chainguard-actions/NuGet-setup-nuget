@@ -1,0 +1,38 @@
+name: Test NuGet setup - semver range
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup-nuget
+        name: Setup NuGet (semver range 5.x)
+        uses: .
+        with:
+          nuget-version: '5.x'
+      - name: Assert nuget is available
+        run: |
+          echo "Checking nuget is available..."
+          if command -v nuget &>/dev/null; then
+            echo "PASS: nuget command found at $(command -v nuget)"
+          else
+            nuget_path=$(find /usr /opt /home /root -name "nuget.exe" 2>/dev/null | head -1 || true)
+            if [ -n "$nuget_path" ]; then
+              echo "PASS: nuget.exe found at $nuget_path"
+            else
+              echo "FAIL: nuget not found"
+              exit 1
+            fi
+          fi
+      - name: Assert nuget version is in the 5.x range
+        run: |
+          echo "Checking nuget version is 5.x..."
+          version_output=$(nuget help 2>&1 | head -1 || true)
+          echo "version output: $version_output"
+          if echo "$version_output" | grep -qE "5\.[0-9]+\.[0-9]+"; then
+            echo "PASS: version 5.x confirmed"
+          else
+            echo "FAIL: expected a 5.x version in output: $version_output"
+            exit 1
+          fi

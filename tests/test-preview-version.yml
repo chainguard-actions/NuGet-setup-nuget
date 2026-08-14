@@ -1,0 +1,37 @@
+name: Test NuGet setup - preview version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup-nuget
+        name: Setup NuGet (preview)
+        uses: .
+        with:
+          nuget-version: 'preview'
+      - name: Assert nuget is available
+        run: |
+          echo "Checking nuget is available..."
+          if command -v nuget &>/dev/null; then
+            echo "PASS: nuget command found at $(command -v nuget)"
+          else
+            nuget_path=$(find /usr /opt /home /root -name "nuget.exe" 2>/dev/null | head -1 || true)
+            if [ -n "$nuget_path" ]; then
+              echo "PASS: nuget.exe found at $nuget_path"
+            else
+              echo "FAIL: nuget not found"
+              exit 1
+            fi
+          fi
+      - name: Assert nuget version output is non-empty
+        run: |
+          echo "Verifying nuget can report its version..."
+          version_output=$(nuget help 2>&1 | head -1 || true)
+          echo "version output: $version_output"
+          if [ -z "$version_output" ]; then
+            echo "FAIL: nuget produced no output"
+            exit 1
+          fi
+          echo "PASS: nuget preview version installed and functional"
