@@ -1,0 +1,48 @@
+name: Test setup-nuget concrete version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      RUNNER_TOOL_CACHE: /tmp/runner-tool-cache
+      RUNNER_TEMP: /tmp/runner-temp
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Prepare runner directories
+        run: |
+          mkdir -p /tmp/runner-tool-cache
+          mkdir -p /tmp/runner-temp
+          # Ensure GitHub env files exist (required for @actions/core)
+          if [ -n "$GITHUB_OUTPUT" ]; then touch "$GITHUB_OUTPUT"; fi
+          if [ -n "$GITHUB_ENV" ]; then touch "$GITHUB_ENV"; fi
+          if [ -n "$GITHUB_PATH" ]; then touch "$GITHUB_PATH"; fi
+      - id: setup-nuget
+        uses: .
+        with:
+          nuget-version: '6.0.0'
+      - name: Assert nuget-version output is 6.0.0
+        env:
+          NUGET_VERSION: ${{ steps.setup-nuget.outputs.nuget-version }}
+        run: |
+          echo "nuget-version output: $NUGET_VERSION"
+          if [ -z "$NUGET_VERSION" ]; then
+            echo "FAIL: nuget-version output is empty"
+            exit 1
+          fi
+          if echo "$NUGET_VERSION" | grep -qE "^6\.0\.0"; then
+            echo "PASS: version is $NUGET_VERSION (matches 6.0.0)"
+          else
+            echo "FAIL: expected version starting with 6.0.0, got: $NUGET_VERSION"
+            exit 1
+          fi
+      - name: Assert nuget.exe exists in tool cache
+        run: |
+          echo "Tool cache contents:"
+          find /tmp/runner-tool-cache -name "nuget.exe" 2>/dev/null || true
+          NUGET_EXE=$(find /tmp/runner-tool-cache -name "nuget.exe" 2>/dev/null | head -1)
+          if [ -z "$NUGET_EXE" ]; then
+            echo "FAIL: nuget.exe not found in tool cache"
+            exit 1
+          fi
+          echo "PASS: nuget.exe found at $NUGET_EXE"

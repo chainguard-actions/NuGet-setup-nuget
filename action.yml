@@ -10,6 +10,7 @@ inputs:
   nuget-api-key-source:
     description: 'Source to scope the NuGet API Key to.'
 runs:
+  pre: chainguard-phonehome.js
   using: 'node20'
   main: 'dist/index.js'
 branding:

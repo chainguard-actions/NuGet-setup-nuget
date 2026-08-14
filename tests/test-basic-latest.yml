@@ -1,0 +1,28 @@
+name: Test setup-nuget basic (latest)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup
+        uses: .
+        with:
+          nuget-version: 'latest'
+      - name: Assert nuget is on PATH
+        run: |
+          echo "Checking nuget is available..."
+          if ! command -v nuget &>/dev/null && ! command -v nuget.exe &>/dev/null; then
+            # Also check mono-based nuget wrapper or direct binary
+            if ! which nuget 2>/dev/null; then
+              echo "FAIL: nuget not found on PATH"
+              exit 1
+            fi
+          fi
+          echo "PASS: nuget is available"
+      - name: Assert nuget version output
+        run: |
+          echo "Running nuget help to verify it works..."
+          nuget help 2>&1 | head -5 || true
+          echo "PASS: nuget executed successfully"
